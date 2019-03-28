@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ivy-module version="2.0">
+  <info organisation="com.realgood.scraper" module="jail-scraper"/>
+  <configurations>
+    <conf name="build" description="Dependencies needed for compilation"/>
+    <conf name="test" extends="build" visibility="private"/>
+  </configurations>
+   <dependencies>
+        <dependency org="junit" name="junit" rev="4.10" conf="test->default"/>
+        <dependency org="com.google.code.gson" name="gson" rev="2.2.2" conf="build->default" />
+        <dependency org="log4j" name="log4j" rev="1.2.17" conf="build->default" />
+        <dependency org="org.apache.commons" name="commons-lang3" rev="3.1" conf="build->default" />
+        <dependency org="org.jsoup" name="jsoup" rev="1.8.3" conf="build->default" />
+		<dependency org="com.google.protobuf" name="protobuf-java" rev="3.6.1" conf="build->default"/>
+    </dependencies>
+</ivy-module>

@@ -1,0 +1,13 @@
+<ivysettings>
+        <settings defaultResolver="chain" />
+        <!-- <caches  defaultCacheDir="${cache.dir}" checkUpToDate="false" /> -->
+        <resolvers>
+        	<chain name="chain">
+                <ibiblio name="central" m2compatible="true"/>
+                <filesystem name="internal">
+                        <ivy pattern="${user.home}/depository/[module]/ivy-[revision].xml" />
+                        <artifact pattern="${user.home}/depository/[module]/[artifact]-[revision].[ext]" />
+                </filesystem>
+            </chain>
+        </resolvers>
+</ivysettings>

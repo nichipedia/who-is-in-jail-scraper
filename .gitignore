@@ -1,0 +1,8 @@
+.classpath
+.project
+/.settings
+.ant-targets-build.xml
+/bin
+/build
+/libs
+/src/com/realgood/protobuf/*

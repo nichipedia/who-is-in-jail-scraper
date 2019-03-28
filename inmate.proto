@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+option java_outer_classname="InmateData";
+option java_package="com.realgood.protobuf";
+
+message Inmate {
+	required string name = 1;
+	required string jail = 2;
+	required string date = 3;
+	required string bail = 5;
+	required string age = 6;
+	enum Gender {
+		MALE = 0;
+		FEMALE = 1;
+		UNKNOWN = 2;
+	}
+	optional Gender gender = 7; 
+	optional string releaseable = 8;
+	optional string mug_shot = 9;
+	optional string race = 10;
+	required string bookingDescription = 4;
+}

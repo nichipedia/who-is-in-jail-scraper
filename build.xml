@@ -1,0 +1,73 @@
+<?xml version = "1.0"?>
+<project name = "Who's in Jail Web Scraper" default = "info" xmlns:ivy="antlib:org.apache.ivy.ant">
+	<property name="build.dir" value="build"/>
+	<property name="src.dir" value="src"/>
+	<property name="doc.dir" value="${build.dir}/doc"/>
+	<property name="bin.dir" value="${build.dir}/bin"/>
+	<property name="artifact.dir" value="${build.dir}/artifact"/>
+	<property name="lib.dir" value="libs"/>
+	<property file="/usr/ant/build.properties"/>
+	<property file="${basedir}/version.properties"/>
+	
+	<target name = "info">
+	   <echo>${ant.project.name}</echo>
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+		<mkdir dir="${bin.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+		<mkdir dir="${artifact.dir}"/>
+	</target>
+	
+	<target name="gensrc">
+		<exec executable="protoc" failonerror="true">
+			<arg value="--java_out=${src.dir}"/>
+			<arg line="./inmate.proto"/>
+		</exec>
+	</target>
+	
+	<target name="clean-ivy">
+		<delete>
+			 <fileset dir="${lib.dir}"/>
+		</delete>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"></delete>
+		<delete dir="proto"></delete>
+	</target>
+	
+	<target name="compile" depends="resolve, gensrc" description="Compile sources">
+		<echo message="Compiling sources"/>
+		<javac destdir="${bin.dir}" source="8" target="8" classpathref="build.path">
+			<src path="${src.dir}"/>
+		</javac>
+		<echo message="Sources are compiled"/>
+	</target>
+	
+	<target name="javadoc" depends="init" description="Generate the javadocs for this project">
+		<echo message="Javadoc created!"></echo>
+		<javadoc packagenames="com.realgood.api.core.*" sourcepath="${src.dir}"
+			destdir="${doc.dir}" version="true" >
+		</javadoc>
+		<echo message="Javadoc created!"></echo>
+	</target>
+	
+	<target name="resolve" depends="init">
+		<echo message="Resolving Dependencies!!"/>
+		<ivy:resolve/>
+		<ivy:cachepath pathid="build.path" conf="build"/>
+		<ivy:retrieve pattern="${lib.dir}/[conf]/[artifact]-[type]-[revision].[ext]" />
+	</target>
+	
+	<target name="publish" depends="package-jar" description="Publish to local depository">
+		<echo message="This will be the publish depository"/>
+	</target>
+	
+	<target name="package-jar" depends="compile">
+		<echo message="Packaging the Jar"/>
+		<jar destfile="${artifact.dir}/${ant.project.name}-${major}.${minor}.jar" basedir="${bin.dir}"></jar>	
+	</target>
+</project>
