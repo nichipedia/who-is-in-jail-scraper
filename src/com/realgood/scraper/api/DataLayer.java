@@ -2,6 +2,7 @@ package com.realgood.scraper.api;
 
 import java.util.List;
 import com.realgood.protobuf.InmateData;
+import com.realgood.protobuf.InmateData.Inmate;
 
 /**
  * 
@@ -20,14 +21,14 @@ public interface DataLayer {
 	 * 
 	 * @return
 	 */
-	List<InmateData> getInmate();
+	List<Inmate> getInmates();
 	
 	/**
 	 * 
 	 * @param name
 	 * @return
 	 */
-	List<InmateData> getInmate(final String name);
+	List<Inmate> getInmate(final String name);
 	
 	/**
 	 * 
@@ -35,5 +36,5 @@ public interface DataLayer {
 	 * @param endDate
 	 * @return
 	 */
-	List<InmateData> getInmate(final long startDate, final long endDate);
+	List<Inmate> getInmate(final long startDate, final long endDate);
 }

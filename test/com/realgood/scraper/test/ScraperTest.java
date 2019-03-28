@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element;
 
 import com.realgood.protobuf.InmateData;
 import com.realgood.protobuf.InmateData.Inmate;
+import com.realgood.protobuf.InmateData.Inmate.Builder;
 import com.realgood.protobuf.InmateData.Inmate.Gender;
 
 /**
@@ -33,13 +34,13 @@ public class ScraperTest {
 	public static void main(String[] args) {
 		BasicConfigurator.configure();
 		try {
-			final URL url = new URL("https://www.stpso.com/cron/inmate_pull.php?page=current&page_num=31");
+			final URL url = new URL("https://www.stpso.com/cron/inmate_pull.php?page=current&page_num=29");
 			final String jail = "St. Tammany Parish Jail";
 			final DateFormat formatter = new SimpleDateFormat("MM/dd/YY");	
 			final Date time = new Date();
 			final String today = formatter.format(time);
 			final Document page = Jsoup.parse(url, 20000);
-			final List<String> inmates = page.select("div[class=inmate row]")
+			final List<Inmate> inmates = page.select("div[class=inmate row]")
 			.stream()
 			.filter(inmate -> {
 				final String bookingDate = inmate.select("td").get(1).text();
@@ -53,39 +54,55 @@ public class ScraperTest {
 				final String description = inmate.select("td").get(3).text();
 				
 				final String inmateNumber = inmate.select("td").get(0).text();
-				String age = "NOT FOUND";
-				Gender gender = Gender.UNKNOWN;
-				String releasable = "NOT FOUND";
-				String mug_shot = "";
-				String race = "NOT FOUND";
+				
+				final Builder builder = Inmate.newBuilder();
 			
 				
 				try {
 					final URL profileURL = new URL(getURL(inmateNumber));
 					final Document profile = Jsoup.parse(profileURL, 20000);
 					List<Element> rows = profile.select("td");
-					age = rows.get(1).text();
+					final String age = rows.get(1).text();
+					if (age.length() != 0) {
+						builder.setAge(age);
+					} else {
+						builder.setAge("NOT FOUND");
+					}
 					String sex = rows.get(2).text();
 					if (sex.equals("M")) {
-						gender = Gender.MALE;
+						builder.setGender(Gender.MALE);
 					} else if (sex.equals("F")) {
-						gender = Gender.FEMALE;
+						builder.setGender(Gender.FEMALE);
+					} else {
+						builder.setGender(Gender.UNKNOWN);
 					}
-					race = rows.get(3).text();
-					releasable = rows.get(5).text();
+					final String race = rows.get(3).text();
+					if (race.length() != 0) {
+						builder.setRace(race);
+					} else {
+						builder.setRace("NOT FOUND");
+					}
+					final String releasable = rows.get(5).text();
+					if (releasable.length() != 0) {
+						builder.setReleaseable(releasable);
+					} else {
+						builder.setReleaseable("NOT FOUND");
+					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					logger.error(e);
 				}
 				
 				
 				
-				Inmate data = Inmate.newBuilder().setName(fullName)
+				final String mugShotURL = getMugShotURL(inmateNumber);
+				final Inmate data = builder.setName(fullName)
 						.setBookingDescription(description)
 						.setJail(jail)
 						.setDate(today)
+						.setBail(bail)
+						.setMugShot(mugShotURL)
 						.build();
-				return inmateNumber;
+				return data;
 			})
 			.collect(Collectors.toList());
 			
@@ -96,7 +113,7 @@ public class ScraperTest {
 	}
 	
 	public static String getMugShotURL(final String inmateId) {
-		return String.format("view-source:https://www.stpso.com/inmate_roster_gallery/%s.jpg", inmateId);
+		return String.format("https://www.stpso.com/inmate_roster_gallery/%s.jpg", inmateId);
 	}
 	
 	public static String getURL(final String inmateId) {
